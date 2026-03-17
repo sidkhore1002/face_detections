@@ -48,6 +48,48 @@
 			<key>uniqueIdentifier</key>
 			<string>9FCFA235-812D-448C-B217-1D699F3CC508</string>
 		</dict>
+		<key>FC1B786B-3041-4EC0-B4C0-476B1D2D617B</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>FC1B786B-3041-4EC0-B4C0-476B1D2D617B.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Runner project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Runner</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Cleaning workspace Runner with scheme Runner</string>
+			<key>timeStartedRecording</key>
+			<real>795434602.92072701</real>
+			<key>timeStoppedRecording</key>
+			<real>795434603.165658</real>
+			<key>title</key>
+			<string>Cleaning workspace Runner with scheme Runner</string>
+			<key>uniqueIdentifier</key>
+			<string>FC1B786B-3041-4EC0-B4C0-476B1D2D617B</string>
+		</dict>
 	</dict>
 </dict>
 </plist>

@@ -20,7 +20,7 @@ late List<CameraDescription> cameras;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
-  HttpOverrides.global = MyHttpOverrides();
+  // HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
 
@@ -397,7 +397,9 @@ class _FaceRotationPageState extends State<FaceRotationPage> {
   Future<void> sendFormDataImageToBE(File imageFile) async {
     try {
       final uri =
-          Uri.parse("https://${_ipController.text}/query-face-from-image");
+          // Uri.parse("https://${_ipController.text}/query-face-from-image");
+          Uri.parse(
+              "http://${_ipController.text}/fm/fetch_face_detail_from_fms");
       var request = http.MultipartRequest('POST', uri);
 
       request.files.add(
@@ -430,6 +432,18 @@ class _FaceRotationPageState extends State<FaceRotationPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text("Employee record not found"),
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.only(bottom: 10, left: 16, right: 16),
+            ),
+          );
+        }
+      } else if (response.statusCode == 403) {
+        final data = jsonDecode(responseBody);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("${data['message']}"),
               backgroundColor: Colors.redAccent,
               behavior: SnackBarBehavior.floating,
               margin: const EdgeInsets.only(bottom: 10, left: 16, right: 16),
