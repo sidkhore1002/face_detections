@@ -13,7 +13,10 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'http_override.dart';
+import 'mpin_screen.dart';
+
 
 late List<CameraDescription> cameras;
 
@@ -30,7 +33,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FaceRotationPage(),
+      // home: FaceRotationPage(),
+      home: MpinScreen(),
     );
   }
 }
@@ -77,7 +81,7 @@ class _FaceRotationPageState extends State<FaceRotationPage> {
 
       _cameraController = CameraController(
         frontCamera,
-        ResolutionPreset.medium,
+        ResolutionPreset.low,
         enableAudio: false,
         imageFormatGroup: ImageFormatGroup.yuv420,
       );
@@ -396,11 +400,27 @@ class _FaceRotationPageState extends State<FaceRotationPage> {
 
   Future<void> sendFormDataImageToBE(File imageFile) async {
     try {
+      // ✅ Get token from SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("token");
+
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Token not found. Please login again."),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        return;
+      }
+
       final uri =
-          // Uri.parse("https://${_ipController.text}/query-face-from-image");
           Uri.parse(
               "http://${_ipController.text}/fm/fetch_face_detail_from_fms");
       var request = http.MultipartRequest('POST', uri);
+
+      // ✅ Add Authorization header
+      request.headers['Authorization'] = 'Bearer $token';
 
       request.files.add(
         await http.MultipartFile.fromPath(
@@ -426,6 +446,22 @@ class _FaceRotationPageState extends State<FaceRotationPage> {
               margin: const EdgeInsets.only(bottom: 10, left: 16, right: 16),
             ),
           );
+        }
+      } else if (response.statusCode == 401) {
+        await stopDetection();
+        final data = jsonDecode(responseBody);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("${data['message']}"),
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.only(bottom: 10, left: 16, right: 16),
+            ),
+          );
+          Future.delayed(const Duration(milliseconds: 1000), () {
+            Navigator.pop(context);
+          });
         }
       } else if (response.statusCode == 404) {
         if (mounted) {
@@ -561,6 +597,19 @@ class _FaceRotationPageState extends State<FaceRotationPage> {
     super.dispose();
   }
 
+Future<void> _handleLogout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("token"); // clear token
+    await stopDetection();
+    if (!mounted) return;
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const MpinScreen()),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = _cameraController;
@@ -583,7 +632,19 @@ class _FaceRotationPageState extends State<FaceRotationPage> {
       },      
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: AppBar(title: const Text("Face Blink Detection")),
+        // appBar: AppBar(title: const Text("Face Blink Detection")),
+        appBar: AppBar(
+          title: const Text("Face Blink Detection"),
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.logout,
+                color: Colors.redAccent,
+              ),
+              onPressed: _handleLogout,
+            ),
+          ],
+        ),
         body: Stack(
           children: [
             Column(
